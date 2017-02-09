@@ -19,12 +19,13 @@ position[2] = -5.001
 #for loop changing positions 
 #there is a potential bug if the position update returns 
 #a position that's >4*BOXSIZE
-for i in range(3):
-    if position[i] > BOXSIZE:
-        position[i] = -2*BOXSIZE+position[i]
-        print "The " +str(i) +" position is " +str(position[i])
-    elif position[i] < -BOXSIZE:
-        position[i] = 2*BOXSIZE+position[i]
-        print "The " +str(i) +" position is " +str(position[i])
-    else:
-        print "The " +str(i) +" position is " +str(position[i])
+def pbc(self,BOXSIZE):
+    for i in range(3):
+        if position[i] > BOXSIZE:
+            position[i] = -2*BOXSIZE+position[i]
+            print "The " +str(i) +" position is " +str(position[i])
+        elif position[i] < -BOXSIZE:
+            position[i] = 2*BOXSIZE+position[i]
+            print "The " +str(i) +" position is " +str(position[i])
+        else:
+            print "The " +str(i) +" position is " +str(position[i])
