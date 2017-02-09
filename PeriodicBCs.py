@@ -31,4 +31,4 @@ def pbc(self,BOXSIZE):
             print "The " +str(i) +" position is " +str(position[i])
 
 #to fix potential bug we could add another if
-#-> 2*BS+position added 
+#-> 2*BS+position added however this wont be a problem is dt is small
