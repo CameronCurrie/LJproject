@@ -51,7 +51,16 @@ def setInitialPositions(rho, particles):
     
     # Return the box size as Vector3D object
     return np.array([boxSize, boxSize, boxSize])
+
+def boxSize(rho,particles):
+    # Determine number of particles
+    nAtoms = len(particles)
     
+    # Set box dimensions
+    boxSize = (nAtoms/rho)**(1./3.)
+
+    return boxSize
+
 def setInitialVelocities(temp, particles):
     
     # Determine number of particles
