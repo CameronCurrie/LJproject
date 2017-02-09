@@ -11,27 +11,20 @@ BOXSIZE = 5
 
 #set test positions for our particle in each axis x,y,z
 position = [0,0,0]
-position[0] = -5.1
-position[1] = 5.1
-position[2] = 0
+position[0] = -5.01
+position[1] = -4
+position[2] = -5.001
 
 
-#for loop changing positions
+#for loop changing positions 
+#there is a potential bug if the position update returns 
+#a position that's >4*BOXSIZE
 for i in range(3):
     if position[i] > BOXSIZE:
-        position[i] = -BOXSIZE
+        position[i] = -2*BOXSIZE+position[i]
         print "The " +str(i) +" position is " +str(position[i])
     elif position[i] < -BOXSIZE:
-        position[i] = BOXSIZE
+        position[i] = 2*BOXSIZE+position[i]
         print "The " +str(i) +" position is " +str(position[i])
     else:
         print "The " +str(i) +" position is " +str(position[i])
-
-
-"""
-
-if position[1] > BOXSIZE:
-    position[1] = -BOXSIZE
-    print "The negative boxsize is" +str(-BOXSIZE)
-    print "The y position is" +str(position[1])
-"""
