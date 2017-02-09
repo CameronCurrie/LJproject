@@ -56,13 +56,13 @@ class Particle3D(object):
         name = str(tokens[7])        
         return Particle3D(position,velocity,mass,name)
     
-    @staticmethod
+    """@staticmethod
     def readconditions(inFile)
         line = inFile.readline()
         tokens = line.split()
         rho = float(tokens[0]) 
         temp = float(tokens[1])
-
+"""
     #Seperation of two instances of the Particle3D class
     @staticmethod   
     def Seperation(particle1,particle2):
