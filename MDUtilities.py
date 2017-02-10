@@ -4,7 +4,7 @@ CMod Project B: auxiliary MD methods
 
 import random
 import numpy as np
-
+#changes
 def setInitialPositions(rho, particles):
     
     # Determine number of particles
