@@ -54,7 +54,7 @@ energyValue = [p1.kineticenergy()+potential]
 def VerletIntegration(dt,particle):
     Force = 48*((1/vc.mag(p.Seperation(p2.position, p1.position))**14)-(0.5/vc.mag(p.Seperation(p2.position, p1.position))**8))*p.Seperation(particle1,particle2)
 
-"""We need to make this work for all particles"""
+
     for i in range(numstep):
         #Update the position given the initial force
         p1.leapPosition2nd(dt, Force)

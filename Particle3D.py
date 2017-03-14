@@ -17,7 +17,7 @@ class Particle3D(object):
 
     # Formatted output as String
     def __str__(self):
-        return "name =" +str(self.name) + ", position(x,y,z) = " + str(self.position) +", velocity = " + str(self.velocity) + "mass = " +str(self.mass)
+        return str(self.name) + " " + str(self.position) +" " + str(self.velocity) + " " +str(self.mass)
 	
 
     # Kinetic energy

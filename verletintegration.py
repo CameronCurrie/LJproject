@@ -14,15 +14,6 @@ import math
 import VectorMethods as vc
 import numpy as np
 
-#need to import initial particles here
-
-"""
-seperation of two particles, i and j, 
-in the n direction (either x,y,z)
-"""
-n = 1
-dt = 0.01
-BOXSIZE = 5
 
 
 #periodic boundary conditions 
@@ -49,25 +40,31 @@ def mic(p1, p2, BOXSIZE):
             if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
                 p1.position[2] + BOXSIZE
     return vc.mag(p.Seperation(p1, p2))
-    
 
 
-def verletintegration(timeinterval, particles, BOXSIZE, numstep):
+#force calculating fucntion
+def force(p1, p2):
+    F = 48*(1/vc.mag(p.Seperation(p1, p2)**14)-(0.5/vc.mag(p.Seperation(p1, p2))**8))*p.Seperation(p1,p2)
+    return F
+
+
+def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
     for p1 in particles:
         for p2 in particles:
             print p1
             print p2
 
             if p1 != p2:
-                mic(p1, p2, BOXSIZE)
-                pbc(BOXSIZE, p1, p2)
-                force = 48*(1/vc.mag(p.Seperation(p1, p2)**14)-(0.5/vc.mag(p.Seperation(p1, p2))**8))*p.Seperation(p1,p2)
+
+                force(p1, p2)
                 for i in range(numstep):
+                    mic(p1, p2, BOXSIZE)
+                    pbc(BOXSIZE, p1, p2)
                     #Updatethe position given the initial force
                     p1.leapPosition2nd(timeinterval, force)
                     p2.leapPosition2nd(timeinterval, force)
                     #Updateforce for the new position
-                    force_new = 48*(1/vc.mag(p.Seperation(p1, p2)**14)-(0.5/vc.mag(p.Seperation(p1, p2))**8))*p.Seperation(p1,p2)
+                    force_new = force(p1, p2)
 
                     #Updatevelocity based of the average of the two forces
                     p1.leapVelocity(timeinterval,0.5*(force+force_new))
@@ -81,3 +78,5 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep):
                     #Reset force
                     force = force_new
                     i += 1
+                    outfile.write(str(particles))
+                outfile.close()
