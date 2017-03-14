@@ -43,10 +43,11 @@ def pbc(BOXSIZE, p1, p2):
 #minimum image convention function
 def mic(p1, p2, BOXSIZE):
     if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
-        i = 0
-        while vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
-            p2.position[i] + BOXSIZE
-            i += 1
+        p1.position[0] + BOXSIZE
+        if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
+            p1.position[1] + BOXSIZE
+            if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
+                p1.position[2] + BOXSIZE
     return vc.mag(p.Seperation(p1, p2))
     
 
