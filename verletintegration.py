@@ -24,46 +24,59 @@ n = 1
 dt = 0.01
 BOXSIZE = 5
 
-def pbc(self, BOXSIZE, p1, p2):
+
+#periodic boundary conditions 
+def pbc(BOXSIZE, p1, p2):
+    #checks for each dimension if the particle is outside the box
     for i in range(3):
         if p1.position[i] > BOXSIZE:
             p1.position[i] = -2*BOXSIZE+p1.position[i]
-            print "The " +str(i) +" position is " +str(p1.position[i])
+            #print "The " +str(i) +" position is " +str(p1.position[i])
         elif p1.position[i] < -BOXSIZE:
             p1.position[i] = 2*BOXSIZE+p1.position[i]
-            print "The " +str(i) +" position is " +str(p1.position[i])
-        else:
-            print "The " +str(i) +" position is " +str(p1.position[i])
+            #print "The " +str(i) +" position is " +str(p1.position[i])
+        #else:
+            #print "The " +str(i) +" position is " +str(p1.position[i])
 
 
-def verletintegration(timeinterval, particles, particlenumber):
+
+#minimum image convention function
+def mic(p1, p2, BOXSIZE):
+    if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
+        i = 0
+        while vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
+            p2.position[i] + BOXSIZE
+            i += 1
+    return vc.mag(p.Seperation(p1, p2))
+    
+
+
+def verletintegration(timeinterval, particles, BOXSIZE, numstep):
     for p1 in particles:
         for p2 in particles:
-            if p != p2:
-                seperation = vc.diff(p1, p2)
-                distance = vc.mag(seperation)
+            print p1
+            print p2
 
-                Force = Force = 48*((1/vc.mag(p.Seperation(p2.position, p1.position))**14)-(0.5/vc.mag(p.Seperation(p2.position, p1.position))**8))*p.Seperation(p1,particle2)
+            if p1 != p2:
+                mic(p1, p2, BOXSIZE)
+                pbc(BOXSIZE, p1, p2)
+                force = 48*(1/vc.mag(p.Seperation(p1, p2)**14)-(0.5/vc.mag(p.Seperation(p1, p2))**8))*p.Seperation(p1,p2)
                 for i in range(numstep):
                     #Updatethe position given the initial force
-                    p1.leapPosition2nd(dt, Force)
-                
+                    p1.leapPosition2nd(timeinterval, force)
+                    p2.leapPosition2nd(timeinterval, force)
                     #Updateforce for the new position
-                    Force_new = 48*((1/vc.mag(p.Seperation(p2.position, p1.position))**14)-(0.5/vc.mag(p.Seperation(p2.position, p1.position))**8))*p.Seperation(particle1,particle2)
-                
-                    #Updatevelocity based of the average of the two forces
-                    p1.leapVelocity(dt,0.5*(Force+Force_new))
-                
-                    #Updatethe different types of energy
-                    potentil = 4*((1/vc.mag(p.Seperation(p2.position, p1.position))**12)-(1/vc.mag(p.Seperation(p2.position, p1.position))**6))
-                    p1.kineticenergy()
-                
-                    #Reset orce
-                    Force = Force_new
+                    force_new = 48*(1/vc.mag(p.Seperation(p1, p2)**14)-(0.5/vc.mag(p.Seperation(p1, p2))**8))*p.Seperation(p1,p2)
 
-"""
-    if xsep > boxSize/2:
-        set xsep to boxSize + xpos 
-        calculate force
-        set distance back to what they were
-"""
+                    #Updatevelocity based of the average of the two forces
+                    p1.leapVelocity(timeinterval,0.5*(force+force_new))
+                    p2.leapVelocity(timeinterval,0.5*(force+force_new))
+                    #Update the different types of energy
+                    potential = 4*((1/vc.mag(p.Seperation(p1, p2))**12)-(1/vc.mag(p.Seperation(p1, p2))**6))
+                    p1.kineticenergy()
+
+
+                    #this might need changing
+                    #Reset force
+                    force = force_new
+                    i += 1

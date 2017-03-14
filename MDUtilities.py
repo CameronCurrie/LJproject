@@ -4,12 +4,13 @@ CMod Project B: auxiliary MD methods
 
 import random
 import numpy as np
+import Particlecreator as creator
 
 def setInitialPositions(rho, particles):
     
     # Determine number of particles
     nAtoms = len(particles)
-    
+
     # Set box dimensions
     boxSize = (nAtoms/rho)**(1./3.)
     
@@ -52,17 +53,15 @@ def setInitialPositions(rho, particles):
     # Return the box size as Vector3D object
     return np.array([boxSize, boxSize, boxSize])
 
-def boxSize(rho,particles):
-    # Determine number of particles
-    nAtoms = len(particles)
+def boxSize(rho, PNUMBER):
     
     # Set box dimensions
-    boxSize = (nAtoms/rho)**(1./3.)
+    boxSize = (PNUMBER/rho)**(1./3.)
 
     return boxSize
 
 def setInitialVelocities(temp, particles):
-    
+
     # Determine number of particles
     nAtoms = len(particles)
 
@@ -71,7 +70,7 @@ def setInitialVelocities(temp, particles):
     yv0 = 0.0
     zv0 = 0.0
     vsq = 0.0
-    
+
     # Loop over particles, set velocities
     for i in range(nAtoms):
         # Random inital velocities

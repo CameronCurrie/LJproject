@@ -36,6 +36,9 @@ def diff(v,w):
     c = v[2]-w[2]
     return np.array([a,b,c])
 
+def distance(v, w):
+    r = v - w
+    return mag(r)
 #The cross product of two vectors where we calculate each individual element (a,b,c) and then put them into an array
 def cross(v,w):
     a = (v[1]*w[2])-(v[2]*w[1])
