@@ -17,13 +17,13 @@ class Particle3D(object):
 
     # Formatted output as String
     def __str__(self):
-        return str(self.name) + " " + str(self.position) +" " + str(self.velocity) + " " +str(self.mass)
-	
+        return str(self.name) + " " + str(self.position[0]) + " " + str(self.position[1]) + " " + str(self.position[2])
+
 
     # Kinetic energy
     def kineticenergy(self):	
         return 0.5*self.mass*sum(self.velocity**2)
-	
+
 
     # Time integration methods
 
@@ -31,7 +31,7 @@ class Particle3D(object):
     def leapVelocity(self, dt, force):
         self.velocity = self.velocity + dt*force/self.mass
         return self.velocity
-    
+
 
     # First-order position update
     def leapPosition1st(self,dt):

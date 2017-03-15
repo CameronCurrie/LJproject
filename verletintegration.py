@@ -17,7 +17,7 @@ import numpy as np
 
 
 #periodic boundary conditions 
-def pbc(BOXSIZE, p1, p2):
+def pbc(BOXSIZE, p1):
     #checks for each dimension if the particle is outside the box
     for i in range(3):
         if p1.position[i] > BOXSIZE:
@@ -39,7 +39,7 @@ def mic(p1, p2, BOXSIZE):
             p1.position[1] + BOXSIZE
             if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
                 p1.position[2] + BOXSIZE
-    return vc.mag(p.Seperation(p1, p2))
+    return force(p1, p2)
 
 
 #force calculating fucntion
@@ -49,34 +49,49 @@ def force(p1, p2):
 
 
 def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
-    for p1 in particles:
-        for p2 in particles:
-            print p1
-            print p2
+    for i in range(numstep):
 
-            if p1 != p2:
+        #Point tells the xyz file which point we are at in the integral
+        nAtoms = len(particles)
+        point = "Point " + str(i + 1)
+        outfile.write(str(nAtoms) + "\n" + str(point) + "\n")
+        for p1 in particles:
+            
+            #calculates force between a pair of particles that aren't the same particle
+            forceX = []
+            forceY = []
+            forceZ = []
 
-                force(p1, p2)
-                for i in range(numstep):
-                    mic(p1, p2, BOXSIZE)
-                    pbc(BOXSIZE, p1, p2)
-                    #Updatethe position given the initial force
-                    p1.leapPosition2nd(timeinterval, force)
-                    p2.leapPosition2nd(timeinterval, force)
-                    #Updateforce for the new position
-                    force_new = force(p1, p2)
+            for p2 in particles:
 
-                    #Updatevelocity based of the average of the two forces
-                    p1.leapVelocity(timeinterval,0.5*(force+force_new))
-                    p2.leapVelocity(timeinterval,0.5*(force+force_new))
-                    #Update the different types of energy
-                    potential = 4*((1/vc.mag(p.Seperation(p1, p2))**12)-(1/vc.mag(p.Seperation(p1, p2))**6))
-                    p1.kineticenergy()
+                #list for summing each compenent of force
+                if p1 != p2:
+
+                    
+                    F = mic(p1, p2, BOXSIZE)
 
 
-                    #this might need changing
-                    #Reset force
-                    force = force_new
-                    i += 1
-                    outfile.write(str(particles))
-                outfile.close()
+                    forceX.append(F[0])
+                    forceY.append(F[1])
+                    forceZ.append(F[2])
+
+
+            FORCE = np.array([sum(forceX), sum(forceY), sum(forceZ)])
+            #Updatethe positions given the initial force
+            p1.leapPosition2nd(timeinterval, FORCE)
+
+
+            #applies minimum image convention
+            #applies periodic boundary conditions
+            pbc(BOXSIZE, p1)
+            #Updateforce for the new position
+            FORCE_NEW = 0
+            #Updatevelocity based of the average of the two forces
+            p1.leapVelocity(timeinterval, 0.5*(FORCE + FORCE_NEW))
+
+
+            #Set new force to force to be used later
+            FORCE = FORCE_NEW
+            i += 1
+            outfile.write(str(p1) + "\n")
+    outfile.close()

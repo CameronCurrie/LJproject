@@ -1,20 +1,18 @@
 import MDUtilities as MDU
-
-
 import Particlecreator as creator
 import verletintegration as verlet
 import sys
 
 
-if len(sys.argv)!=1:
-	print "Wrong number of arguments."
-	print "Usage: " + sys.argv[0] + " <output file>"
+if len(sys.argv)!=2:
+	print ("Wrong number of arguments.")
+	print ("Usage: " + sys.argv[0] + " <output file>")
 	quit()
 else:
-    outfileName = sys.argv[1]
+	outfileName = sys.argv[1]
+
 #Open output file for writing data to
 outfile = open(outfileName,"w")
-
 
 
 PNUMBER = 9
@@ -33,5 +31,4 @@ MDU.setInitialVelocities(temp,particles)
 BOXSIZE = MDU.boxSize(rho,PNUMBER)
 
 verlet.verletintegration(dt, particles, BOXSIZE, numstep, outfile)
-
 
