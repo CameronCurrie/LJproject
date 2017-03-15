@@ -17,7 +17,7 @@ class Particle3D(object):
 
     # Formatted output as String
     def __str__(self):
-        return "name =" +str(self.name) + ", position(x,y,z) = " + str(self.position) +", velocity = " + str(self.velocity) + "mass = " +str(self.mass)
+        return str(self.name) + " " + str(self.position) +" " + str(self.velocity) + " " +str(self.mass)
 	
 
     # Kinetic energy
@@ -66,7 +66,12 @@ class Particle3D(object):
     #Seperation of two instances of the Particle3D class
     @staticmethod   
     def Seperation(particle1,particle2):
+        return particle1.position - particle2.position
+        
+        
+        """
         xsep = particle1[0] - particle2[0] 
         ysep = particle1[1] - particle2[1]
         zsep = particle1[2] - particle2[2]
         return np.array([xsep,ysep,zsep],float)
+        """

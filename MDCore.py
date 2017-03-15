@@ -1,35 +1,37 @@
 import MDUtilities as MDU
 
-import numpy as np
-import math
-import VectorMethods as VM
-#import VerletVelocity as Ver
-from Particle3D import Particle3D as p
-import Particlecreator as creator
 
-"""
-if len(sys.argv)!=3:
+import Particlecreator as creator
+import verletintegration as verlet
+import sys
+
+
+if len(sys.argv)!=1:
 	print "Wrong number of arguments."
 	print "Usage: " + sys.argv[0] + " <output file>"
 	quit()
 else:
-	outfileName = sys.argv[1]
-    conditions = sys.argv[2]
+    outfileName = sys.argv[1]
 #Open output file for writing data to
 outfile = open(outfileName,"w")
 
-file_handle = open(conditions,"r")
 
-#set up the intial positions of all particles
-InitialPositions = MDU.setInitialPositions(rho, particles)
-InitialVelocities = MDU.setInitialVelocities(temp)
-"""
-PNUMBER = 20
+
+PNUMBER = 9
 rho = 1
 temp = 10
+dt = 0.00001
+numstep = 10
 
+particles = creator.pNamer(PNUMBER)
 
-MDU.setInitialPositions(rho,creator.pNamer(PNUMBER))
-MDU.setInitialVelocities(temp,creator.pNamer(PNUMBER)) #We need to give particle positions
+#set intial veloicities and positions of particles using MDUtilities
+MDU.setInitialPositions(rho,particles)
+MDU.setInitialVelocities(temp,particles)
+
+#Get Boxsize for use in minimum image convention and periodic image boundary
+BOXSIZE = MDU.boxSize(rho,PNUMBER)
+
+verlet.verletintegration(dt, particles, BOXSIZE, numstep, outfile)
 
 
