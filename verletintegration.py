@@ -47,6 +47,25 @@ def force(p1, p2):
     F = 48*(1/vc.mag(p.Seperation(p1, p2)**14)-(0.5/vc.mag(p.Seperation(p1, p2))**8))*p.Seperation(p1,p2)
     return F
 
+#class that enables the reading of initial conditions from some input file
+class conditions(object):
+    def __init__(self, rho, temp, timeinterval, numstep, nAtoms):
+        self.density = rho
+        self.temperature = temp
+        self.timeinterval = timeinterval
+        self.numstep = numstep
+        self.numberofatoms = nAtoms
+
+    @staticmethod
+    def readconditions(inFile):
+        line = inFile.readline()
+        tokens = line.split()
+        rho = float(tokens[0])
+        temp = float(tokens[1])
+        timeinterval = float(tokens[2])
+        numstep = int(tokens[3])
+        nAtoms = int(tokens[4])
+        return conditions(rho, temp, timeinterval, numstep, nAtoms)
 
 def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
     for i in range(numstep):
@@ -56,7 +75,7 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
         point = "Point " + str(i + 1)
         outfile.write(str(nAtoms) + "\n" + str(point) + "\n")
         for p1 in particles:
-            
+
             #calculates force between a pair of particles that aren't the same particle
             forceX = []
             forceY = []
@@ -67,27 +86,50 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
                 #list for summing each compenent of force
                 if p1 != p2:
 
-                    
+
                     F = mic(p1, p2, BOXSIZE)
 
 
                     forceX.append(F[0])
                     forceY.append(F[1])
                     forceZ.append(F[2])
-
+                    
 
             FORCE = np.array([sum(forceX), sum(forceY), sum(forceZ)])
+            #print str(FORCE) + " " + str(i)
             #Updatethe positions given the initial force
-            p1.leapPosition2nd(timeinterval, FORCE)
+            p1.leapPosition1st(FORCE)
+"""
+            forceX_NEW = []
+            forceY_NEW = []
+            forceZ_NEW = []
+            
+
+            for p2 in particles:
+
+                #list for summing each compenent of force
+                if p1 != p2:
 
 
+                    F = mic(p1, p2, BOXSIZE)
+
+
+                    forceX_NEW.append(F[0])
+                    forceY_NEW.append(F[1])
+                    forceZ_NEW.append(F[2])
+                    
+        
+            FORCE_NEW = np.array([sum(forceX_NEW), sum(forceY_NEW), sum(forceZ_NEW)])
+"""
             #applies minimum image convention
             #applies periodic boundary conditions
             pbc(BOXSIZE, p1)
             #Updateforce for the new position
-            FORCE_NEW = 0
+            #FORCE_NEW = 0
+
+
             #Updatevelocity based of the average of the two forces
-            p1.leapVelocity(timeinterval, 0.5*(FORCE + FORCE_NEW))
+            p1.leapVelocity(timeinterval, 0.5*(FORCE+FORCE_NEW))
 
 
             #Set new force to force to be used later
