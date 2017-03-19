@@ -10,3 +10,5 @@ p1 = Particle3D(1, np.array([0,0,0]), np.array([1,1,1]), 1)
 p2 = Particle3D(2, np.array([1,2,5]), np.array([1,1,1]), 1)
 
 print verlet.mic(p1, p2, BOXSIZE)
+print p1
+print p2

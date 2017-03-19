@@ -20,32 +20,33 @@ import numpy as np
 def pbc(BOXSIZE, p1):
     #checks for each dimension if the particle is outside the box
     for i in range(3):
-        if p1.position[i] > BOXSIZE:
-            p1.position[i] = -2*BOXSIZE+p1.position[i]
+        while p1.position[i] > BOXSIZE:
+            p1.position[i] = p1.position[i] - BOXSIZE
             #print "The " +str(i) +" position is " +str(p1.position[i])
-        elif p1.position[i] < -BOXSIZE:
-            p1.position[i] = 2*BOXSIZE+p1.position[i]
-            #print "The " +str(i) +" position is " +str(p1.position[i])
-        #else:
-            #print "The " +str(i) +" position is " +str(p1.position[i])
-
-
+        while p1.position[i] < 0:
+            p1.position[i] = p1.position[i] + BOXSIZE
+        #print "The " +str(i) +" position is " +str(p1.position[i])
+    return p1.position
 
 #minimum image convention function
 def mic(p1, p2, BOXSIZE):
-    if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
-        p1.position[0] + BOXSIZE
-        if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
-            p1.position[1] + BOXSIZE
-            if vc.mag(p.Seperation(p1, p2)) > math.sqrt(3*(BOXSIZE/2)**2):
-                p1.position[2] + BOXSIZE
-    return force(p1, p2)
-
+    for i in range(3):
+        if abs(p1.position[i]-p2.position[i]) > 0.5*BOXSIZE:
+            if (p1.position[i]-p2.position[i]) > 0.5*BOXSIZE:
+                p2.position[i] = p2.position[i] + BOXSIZE
+            if (p1.position[i]-p2.position[i]) < 0.5*BOXSIZE:
+                p2.position[i] = p2.position[i] - BOXSIZE
+        else:
+            p1.position[i] = p1.position[i]
+            p2.position[i] = p2.position[i]
+    return p.Seperation(p1, p2)
 
 #force calculating fucntion
-def force(p1, p2):
-    F = 48*(1/vc.mag(p.Seperation(p1, p2)**14)-(0.5/vc.mag(p.Seperation(p1, p2))**8))*p.Seperation(p1,p2)
-    return F
+def force(p1, p2, BOXSIZE):
+    r1 = (vc.mag(mic(p1, p2, BOXSIZE)))**14
+    r2 = (vc.mag(mic(p1, p2, BOXSIZE)))**8
+    force = 48*mic(p1, p2, BOXSIZE)*((1/r1)-(0.5/r2))
+    return force
 
 #class that enables the reading of initial conditions from some input file
 class conditions(object):
@@ -55,7 +56,8 @@ class conditions(object):
         self.timeinterval = timeinterval
         self.numstep = numstep
         self.numberofatoms = nAtoms
-
+#Reads the conditions 
+#from an input file formated: <density> <temperature> <timeinterval> <numberofsteps> <numberofatoms>
     @staticmethod
     def readconditions(inFile):
         line = inFile.readline()
@@ -68,6 +70,11 @@ class conditions(object):
         return conditions(rho, temp, timeinterval, numstep, nAtoms)
 
 def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
+    #calculates force between a pair of particles that aren't the same particle
+    forceX = []
+    forceY = []
+    forceZ = []
+
     for i in range(numstep):
 
         #Point tells the xyz file which point we are at in the integral
@@ -81,29 +88,29 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
             forceY = []
             forceZ = []
 
-            for p2 in particles:
 
+            for p2 in particles:
+    
                 #list for summing each compenent of force
                 if p1 != p2:
 
 
-                    F = mic(p1, p2, BOXSIZE)
+                    F = force(p1, p2, BOXSIZE)
 
-
+                    
                     forceX.append(F[0])
                     forceY.append(F[1])
                     forceZ.append(F[2])
-                    
+
 
             FORCE = np.array([sum(forceX), sum(forceY), sum(forceZ)])
-            #print str(FORCE) + " " + str(i)
-            #Updatethe positions given the initial force
-            p1.leapPosition1st(FORCE)
-"""
+            #print "force is " + str(FORCE)
+            p1.leapPosition2nd(timeinterval, FORCE, BOXSIZE)
+            #pbc(BOXSIZE, p1)
             forceX_NEW = []
             forceY_NEW = []
             forceZ_NEW = []
-            
+            #print "sep is " + str(p.Seperation(p1, p2))
 
             for p2 in particles:
 
@@ -111,26 +118,18 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
                 if p1 != p2:
 
 
-                    F = mic(p1, p2, BOXSIZE)
+                    F = force(p1, p2, BOXSIZE)
 
 
                     forceX_NEW.append(F[0])
                     forceY_NEW.append(F[1])
                     forceZ_NEW.append(F[2])
-                    
-        
-            FORCE_NEW = np.array([sum(forceX_NEW), sum(forceY_NEW), sum(forceZ_NEW)])
-"""
-            #applies minimum image convention
-            #applies periodic boundary conditions
-            pbc(BOXSIZE, p1)
-            #Updateforce for the new position
-            #FORCE_NEW = 0
 
+
+            FORCE_NEW = np.array([sum(forceX_NEW), sum(forceY_NEW), sum(forceZ_NEW)])
 
             #Updatevelocity based of the average of the two forces
             p1.leapVelocity(timeinterval, 0.5*(FORCE+FORCE_NEW))
-
 
             #Set new force to force to be used later
             FORCE = FORCE_NEW

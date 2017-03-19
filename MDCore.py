@@ -13,7 +13,7 @@ else:
     inputfileName = sys.argv[2]
 
 #Open output file for writing data to
-outfile = open(outfileName,"w")
+outfile = open(outfileName, "w")
 inputfile = open(inputfileName, "r")
 
 
@@ -30,11 +30,10 @@ NUMSTEP = initialconditions.numstep
 particles = creator.pNamer(PNUMBER)
 
 #set intial veloicities and positions of particles using MDUtilities
-MDU.setInitialPositions(RHO,particles)
-MDU.setInitialVelocities(TEMP,particles)
+MDU.setInitialPositions(RHO, particles)
+MDU.setInitialVelocities(TEMP, particles)
 
 #Get Boxsize for use in minimum image convention and periodic image boundary
-BOXSIZE = MDU.boxSize(RHO,PNUMBER)
+BOXSIZE = MDU.boxSize(RHO, PNUMBER)
 
 verlet.verletintegration(DT, particles, BOXSIZE, NUMSTEP, outfile)
-
