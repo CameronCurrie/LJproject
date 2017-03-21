@@ -11,7 +11,8 @@ def sqrmag(v):
 
 #The magnitude of some vector, v
 def mag(v):
-    return math.sqrt(v[0]**2+v[1]**2+v[2]**2)
+    return math.sqrt((v[0]**2)+(v[1]**2)+(v[2]**2))
+
 
 #Some vector, v, multiplied by scalar constant, k
 def scalarM(v,k):

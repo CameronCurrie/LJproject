@@ -17,13 +17,13 @@ class Particle3D(object):
 
     # Formatted output as String
     def __str__(self):
-        return str(self.name) + " " + str(self.position) +" " + str(self.velocity) + " " +str(self.mass)
-	
+        return str(self.name) + " " + str(self.position[0]) + " " + str(self.position[1]) + " " + str(self.position[2])
+
 
     # Kinetic energy
     def kineticenergy(self):	
         return 0.5*self.mass*sum(self.velocity**2)
-	
+
 
     # Time integration methods
 
@@ -31,7 +31,7 @@ class Particle3D(object):
     def leapVelocity(self, dt, force):
         self.velocity = self.velocity + dt*force/self.mass
         return self.velocity
-    
+
 
     # First-order position update
     def leapPosition1st(self,dt):
@@ -40,8 +40,18 @@ class Particle3D(object):
         
 
     # Second-order position update
-    def leapPosition2nd(self,dt,force):
+    def leapPosition2nd(self, dt, force, BOXSIZE):
         self.position = self.position + dt*self.velocity + 0.5*dt**2*force/self.mass
+            #checks for each dimension if the particle is outside the box
+        for i in range(3):
+            while self.position[i] > BOXSIZE:
+                self.position[i] = self.position[i] - BOXSIZE
+                #print "The " +str(i) +" position is " +str(p1.position[i])
+            while self.position[i] < 0:
+                self.position[i] = self.position[i] + BOXSIZE
+            #print "The " +str(i) +" position is " +str(p1.position[i])
+        return self.position
+
         return self.position
 
 
@@ -55,14 +65,8 @@ class Particle3D(object):
         mass = float(tokens[6])
         name = str(tokens[7])        
         return Particle3D(position,velocity,mass,name)
-    
-    """@staticmethod
-    def readconditions(inFile)
-        line = inFile.readline()
-        tokens = line.split()
-        rho = float(tokens[0]) 
-        temp = float(tokens[1])
-"""
+
+
     #Seperation of two instances of the Particle3D class
     @staticmethod   
     def Seperation(particle1,particle2):
