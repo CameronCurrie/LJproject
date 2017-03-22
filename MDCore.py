@@ -43,3 +43,5 @@ BOXSIZE = MDU.boxSize(RHO, PNUMBER)
 
 #run integration code which produces energy graphs and xyz file.
 verlet.verletintegration(DT, particles, BOXSIZE, NUMSTEP, outfile)
+
+verlet.msd(particles, DT, NUMSTEP)
