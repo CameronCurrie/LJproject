@@ -1,5 +1,5 @@
 """
-Exercise 2: methods for vectors represented as Numpy 1*3 arrays
+Used to return the magnitude of vectors
 """
 import math 
 import numpy as np

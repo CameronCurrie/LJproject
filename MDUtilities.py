@@ -6,6 +6,7 @@ import random
 import numpy as np
 import Particlecreator as creator
 
+#sets initial positions given particles and density
 def setInitialPositions(rho, particles):
     
     # Determine number of particles
@@ -53,6 +54,7 @@ def setInitialPositions(rho, particles):
     # Return the box size as Vector3D object
     return np.array([boxSize, boxSize, boxSize])
 
+#Returns the lengths of the size of the box.
 def boxSize(rho, PNUMBER):
     
     # Set box dimensions
@@ -60,6 +62,7 @@ def boxSize(rho, PNUMBER):
 
     return boxSize
 
+#set initial velocites given particles and temperature
 def setInitialVelocities(temp, particles):
 
     # Determine number of particles

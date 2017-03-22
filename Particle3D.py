@@ -1,6 +1,6 @@
-
 """
-Exercise 3: Particle3D Class	
+Particle3D class used to create instances of the class and provide updates on position and velocity
+as well as seperation of two instance of a particle3D object.
 """
 
 import numpy as np
@@ -21,9 +21,9 @@ class Particle3D(object):
 
 
     # Kinetic energy
-    def kineticenergy(self):	
-        return 0.5*self.mass*sum(self.velocity**2)
-
+    def kineticenergy(self):
+        energy = 0.5*self.mass*sum(self.velocity**2)
+        return energy
 
     # Time integration methods
 
@@ -34,24 +34,14 @@ class Particle3D(object):
 
 
     # First-order position update
-    def leapPosition1st(self,dt):
+    def leapPosition1st(self, dt):
         self.position = self.position + dt*self.velocity
         return self.position
-        
+
 
     # Second-order position update
     def leapPosition2nd(self, dt, force, BOXSIZE):
         self.position = self.position + dt*self.velocity + 0.5*dt**2*force/self.mass
-            #checks for each dimension if the particle is outside the box
-        for i in range(3):
-            while self.position[i] > BOXSIZE:
-                self.position[i] = self.position[i] - BOXSIZE
-                #print "The " +str(i) +" position is " +str(p1.position[i])
-            while self.position[i] < 0:
-                self.position[i] = self.position[i] + BOXSIZE
-            #print "The " +str(i) +" position is " +str(p1.position[i])
-        return self.position
-
         return self.position
 
 
@@ -71,11 +61,3 @@ class Particle3D(object):
     @staticmethod   
     def Seperation(particle1,particle2):
         return particle1.position - particle2.position
-        
-        
-        """
-        xsep = particle1[0] - particle2[0] 
-        ysep = particle1[1] - particle2[1]
-        zsep = particle1[2] - particle2[2]
-        return np.array([xsep,ysep,zsep],float)
-        """
