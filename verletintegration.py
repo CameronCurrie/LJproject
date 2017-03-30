@@ -66,10 +66,9 @@ def sumforce(p1, particles, BOXSIZE):
         #takes out particles interacting with themselves.
         if p1 != p2:
             #Calculates force if particle are closer than the LJ cutoff
-            if vc.mag(mic(p1, p2, BOXSIZE)) < 3.5:
+            if vc.mag(mic(p1, p2, BOXSIZE)) < 3.0:
                 F = force(p1, p2, BOXSIZE)
 
-            #LJ cutoff if particle is more than 3.5 units away
             else:
                 F = [0, 0, 0]
 
@@ -83,31 +82,29 @@ def sumforce(p1, particles, BOXSIZE):
     return FORCE
 
 def sumpotential(p1, particles, BOXSIZE):
-    ParticlePotEn = []
+    ParticlePotEnList = []
     for p2 in particles:
         #takes out particles interacting with themselves.
         if p1 != p2:
             #Calculates force if particle are closer than the LJ cutoff
-            if vc.mag(mic(p1, p2, BOXSIZE)) < 3.5:
+            if vc.mag(mic(p1, p2, BOXSIZE)) < 3.0:
                 Potential = potentialenergy(p1, p2, BOXSIZE)
 
                 #LJ cutoff if particle is more than 3.5 units away
             else:
                 Potential = 0
-            ParticlePotEn.append(Potential)
-    return sum(ParticlePotEn)
-
-
+            ParticlePotEnList.append(Potential)
+    return sum(ParticlePotEnList)
 
 def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
     #calculates force between a pair of particles that aren't the same particle
 
     #Creates list of the time of the simulation
-    time = []
+    timeList = []
     #list for total energies of system
-    KinEn = []
-    PotEn = []
-    TotEn = []
+    KinEnList = []
+    PotEnList = []
+    TotEnList = []
     nAtoms = len(particles)
 
 
@@ -115,8 +112,8 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
 
         #Creates list of the time of the simulation
         currenttime = i*timeinterval
-        time.append(currenttime)
-        IntervalKinEnergy = []
+        timeList.append(currenttime)
+        IntervalKinEnergyList = []
         #Point tells the xyz file which point we are at in the integral
         point = "Point " + str(i + 1)
         #writing to xyz file in correct format
@@ -144,47 +141,49 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
 
             i += 1
             outfile.write(str(p1) + "\n")
-            IntervalKinEnergy.append(p.kineticenergy(p1))
+            IntervalKinEnergyList.append(p.kineticenergy(p1))
 
 
         #Appends updated values to lists
-        KinEn.append(sum(IntervalKinEnergy))
-        PotEn.append(ParticlePotEn)
-        TotalEnergy = sum(IntervalKinEnergy) + ParticlePotEn
-        TotEn.append(TotalEnergy)
+        KinEnList.append(sum(IntervalKinEnergyList))
+        PotEnList.append(ParticlePotEn)
+        TotalEnergy = sum(IntervalKinEnergyList) + ParticlePotEn
+        TotEnList.append(TotalEnergy)
 
     #plot graphs using the lists of the energies and time.
-    pyplot.plot(time, KinEn)
+    pyplot.plot(timeList, KinEnList)
     pyplot.title("Kinetic Energy over time")
     pyplot.savefig("kineticenergytime.png")
     pyplot.figure()
     
-    pyplot.plot(time, PotEn)
+    pyplot.plot(timeList, PotEnList)
     pyplot.title("Potential Energy over time")
     pyplot.savefig("potentialenergytime.png")
     pyplot.figure()
     
-    pyplot.plot(time, TotEn)
+    pyplot.plot(timeList, TotEnList)
     pyplot.title("Total Energy over time")
     pyplot.savefig("energytime.png")
     pyplot.figure()
+
+    #close xyz output file
     outfile.close()
 
 #Mean square distance fuction produces a graph.
 def msd(particles, DT, NUMSTEP):
-    time = []
-    msd = []
+    timeList = []
+    msdList = []
     PNUMBER = len(particles)
     #Boxsize is very large to allow diffusion to occur if forces allow it.
     BOXSIZE = 100000000000000000
     for i in range(NUMSTEP):
-        msdtime = []
+        msdcurrenttime = []
         currenttime = i*DT
-        time.append(currenttime)
+        timeList.append(currenttime)
         for p1 in particles:
             if i == 0:
                 initialposition = p1.position
-            
+
             #calculates force
             FORCE = sumforce(p1, particles, BOXSIZE)
             p1.leapPosition2nd(DT, FORCE, BOXSIZE)
@@ -200,13 +199,13 @@ def msd(particles, DT, NUMSTEP):
             #print distancesquared
             currentmsd = distancesquared
             #print currentmsd
-            msdtime.append(currentmsd)
-        msd.append(sum(msdtime)/PNUMBER)
+            msdcurrenttime.append(currentmsd)
+        msdList.append(sum(msdcurrenttime)/PNUMBER)
 
 
-    pyplot.plot(time, msd)
+    pyplot.plot(timeList, msdList)
     pyplot.title("Mean Squared Distance over time")
-    pyplot.savefig("Mean Squared Distance over time")
+    pyplot.savefig("Msdtime.png")
 
 #class that enables the reading of initial conditions from some input file
 class conditions(object):

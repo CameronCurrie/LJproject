@@ -7,7 +7,7 @@ This is the main code, it takes two arguments in the terminal. The first argumen
 	
 	<density> <temperature> <timestep> <numberofsteps> <numberofparticles>
 
-For optimal results of the code, a timestep of =< 0.002 should be used with a number of steps ~2000. The code can take a several minutes to run especially with high particle number. Several graphs will also be saved with names corresponding to what they show. Correct usage of this in the terminal is shown below:
+For optimal results of the code, a timestep of =< 0.005 should be used with a number of steps ~2000. The code can take a several minutes to run especially with a particle number of 32, more particles will take significantly longer. Several graphs will also be saved with names corresponding to what they show. Correct usage of this in the terminal is shown below:
 
 	python MDCore.py <outputfilename>.xyz <initialconditions>.txt
 
@@ -25,7 +25,8 @@ This set the initial positions and velocities of the particles and also provides
 
 
 verletintegration.py	
-This is the code that applies the minimum image conventions and periodic boundary conditions. The force acting on a particle due to another particle and the sum of these forces acting on a particle. It also does the same for potential energy. The verletintegration function runs updates the forces, positions, velocities, energies, time and produces graphs of energy versus time and the xyz file which is used in vmd to visualised the system. Also contains the initial conditions class which allows for the reading of conditions from an input file to set the initial positions and velocities using MDUtilities.
+This is the code that applies the minimum image conventions and periodic boundary conditions. The force acting on a particle due to another particle and the sum of these forces acting on a particle. It also does the same for potential energy. The verletintegration function runs updates the forces, positions, velocities, energies, time and produces graphs of energy versus time and the xyz file which is used in vmd to visualised the system. Also contains the initial conditions class which allows for the reading of conditions from an input file to set the initial positions and velocities using MDUtilities. 
+The Mean square distance takes a long time to run but produces expected results.
 
 
 VectorMethods.py 
