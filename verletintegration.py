@@ -58,7 +58,7 @@ def potentialenergy(p1, p2, BOXSIZE):
     return potential
 
 
-def sumforce(p1, particles, BOXSIZE):
+def sumforce(p1, particles, BOXSIZE, cutoff):
     forceX = []
     forceY = []
     forceZ = []
@@ -66,7 +66,7 @@ def sumforce(p1, particles, BOXSIZE):
         #takes out particles interacting with themselves.
         if p1 != p2:
             #Calculates force if particle are closer than the LJ cutoff
-            if vc.mag(mic(p1, p2, BOXSIZE)) < 3.0:
+            if vc.mag(mic(p1, p2, BOXSIZE)) < cutoff:
                 F = force(p1, p2, BOXSIZE)
 
             else:
@@ -81,13 +81,13 @@ def sumforce(p1, particles, BOXSIZE):
     FORCE = np.array([sum(forceX), sum(forceY), sum(forceZ)])
     return FORCE
 
-def sumpotential(p1, particles, BOXSIZE):
+def sumpotential(p1, particles, BOXSIZE, cutoff):
     ParticlePotEnList = []
     for p2 in particles:
         #takes out particles interacting with themselves.
         if p1 != p2:
             #Calculates force if particle are closer than the LJ cutoff
-            if vc.mag(mic(p1, p2, BOXSIZE)) < 3.0:
+            if vc.mag(mic(p1, p2, BOXSIZE)) < cutoff:
                 Potential = potentialenergy(p1, p2, BOXSIZE)
 
                 #LJ cutoff if particle is more than 3.5 units away
@@ -96,7 +96,7 @@ def sumpotential(p1, particles, BOXSIZE):
             ParticlePotEnList.append(Potential)
     return sum(ParticlePotEnList)
 
-def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
+def verletintegration(timeinterval, particles, BOXSIZE, numstep, cutoff, outfile):
     #calculates force between a pair of particles that aren't the same particle
 
     #Creates list of the time of the simulation
@@ -123,11 +123,11 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
         for p1 in particles:
 
             #calculates force
-            FORCE = sumforce(p1, particles, BOXSIZE)
+            FORCE = sumforce(p1, particles, BOXSIZE, cutoff)
             p1.leapPosition2nd(timeinterval, FORCE, BOXSIZE)
             pbc(BOXSIZE, p1)
             #update force
-            FORCE_NEW = sumforce(p1, particles, BOXSIZE)
+            FORCE_NEW = sumforce(p1, particles, BOXSIZE, cutoff)
 
             #Updatevelocity based of the average of the two forces
             p1.leapVelocity(timeinterval, 0.5*(FORCE+FORCE_NEW))
@@ -136,7 +136,7 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
             FORCE = FORCE_NEW
 
             #work out energies for particle
-            ParticlePotEn = sumpotential(p1, particles, BOXSIZE)
+            ParticlePotEn = sumpotential(p1, particles, BOXSIZE, cutoff)
 
 
             i += 1
@@ -151,31 +151,36 @@ def verletintegration(timeinterval, particles, BOXSIZE, numstep, outfile):
         TotEnList.append(TotalEnergy)
 
     #plot graphs using the lists of the energies and time.
-    pyplot.plot(timeList, KinEnList)
-    pyplot.title("Kinetic Energy over time")
-    pyplot.savefig("kineticenergytime.png")
-    pyplot.figure()
+    pyplot.plot(timeList, KinEnList, "r", label = "Kinetic Energy")
+    #pyplot.title("Kinetic Energy over time")
+    #pyplot.savefig("kineticenergytime.png")
+    #pyplot.figure()
     
-    pyplot.plot(timeList, PotEnList)
-    pyplot.title("Potential Energy over time")
-    pyplot.savefig("potentialenergytime.png")
-    pyplot.figure()
+    pyplot.plot(timeList, PotEnList, "b", label = "Potential Energy")
+    #pyplot.title("Potential Energy over time")
+    #pyplot.savefig("potentialenergytime.png")
+    #pyplot.figure()
     
-    pyplot.plot(timeList, TotEnList)
-    pyplot.title("Total Energy over time")
+    pyplot.plot(timeList, TotEnList, "g", label="Total Energy")
+    pyplot.legend()
+    pyplot.title("Energy over time")
+    pyplot.xlabel("Time")
+    pyplot.ylabel("Energy")
     pyplot.savefig("energytime.png")
     pyplot.figure()
 
     #close xyz output file
     outfile.close()
+    #close xyz output file
+    outfile.close()
 
 #Mean square distance fuction produces a graph.
-def msd(particles, DT, NUMSTEP):
+def msd(particles, DT, NUMSTEP, cutoff):
     timeList = []
     msdList = []
     PNUMBER = len(particles)
     #Boxsize is very large to allow diffusion to occur if forces allow it.
-    BOXSIZE = 100000000000000000
+    BOXSIZE = 1000000000000000
     for i in range(NUMSTEP):
         msdcurrenttime = []
         currenttime = i*DT
@@ -185,11 +190,11 @@ def msd(particles, DT, NUMSTEP):
                 initialposition = p1.position
 
             #calculates force
-            FORCE = sumforce(p1, particles, BOXSIZE)
+            FORCE = sumforce(p1, particles, BOXSIZE, cutoff)
             p1.leapPosition2nd(DT, FORCE, BOXSIZE)
 
             #update force
-            FORCE_NEW = sumforce(p1, particles, BOXSIZE)
+            FORCE_NEW = sumforce(p1, particles, BOXSIZE, cutoff)
             #Updatevelocity based of the average of the two forces
             p1.leapVelocity(DT, 0.5*(FORCE+FORCE_NEW))
             #Set new force to force to be used later
@@ -209,12 +214,13 @@ def msd(particles, DT, NUMSTEP):
 
 #class that enables the reading of initial conditions from some input file
 class conditions(object):
-    def __init__(self, rho, temp, timeinterval, numstep, nAtoms):
+    def __init__(self, rho, temp, timeinterval, numstep, nAtoms, cutoff):
         self.density = rho
         self.temperature = temp
         self.timeinterval = timeinterval
         self.numstep = numstep
         self.numberofatoms = nAtoms
+        self.cutoff = cutoff
 #Reads the conditions 
 #from an input file formated: <density> <temperature> <timeinterval> <numberofsteps> <numberofatoms>
     @staticmethod
@@ -226,4 +232,5 @@ class conditions(object):
         timeinterval = float(tokens[2])
         numstep = int(tokens[3])
         nAtoms = int(tokens[4])
-        return conditions(rho, temp, timeinterval, numstep, nAtoms)
+        cutoff = int(tokens[5])
+        return conditions(rho, temp, timeinterval, numstep, nAtoms, cutoff)

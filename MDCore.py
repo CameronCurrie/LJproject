@@ -30,6 +30,7 @@ RHO = initialconditions.density
 TEMP = initialconditions.temperature
 DT = initialconditions.timeinterval
 NUMSTEP = initialconditions.numstep
+CUTOFF = initialconditions.cutoff
 
 #names and creates the particles
 particles = creator.pNamer(PNUMBER)
@@ -42,6 +43,6 @@ MDU.setInitialVelocities(TEMP, particles)
 BOXSIZE = MDU.boxSize(RHO, PNUMBER)
 
 #run integration code which produces energy graphs and xyz file.
-verlet.verletintegration(DT, particles, BOXSIZE, NUMSTEP, outfile)
+verlet.verletintegration(DT, particles, BOXSIZE, NUMSTEP, CUTOFF, outfile)
 
-verlet.msd(particles, DT, NUMSTEP)
+verlet.msd(particles, DT, NUMSTEP, CUTOFF)
